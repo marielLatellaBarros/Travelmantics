@@ -7,9 +7,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -30,11 +35,21 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.insert_menu) { // also: use switch generally for menus
+        switch(item.getItemId()) {
+            case R.id.insert_menu:
             Intent intent = new Intent(this, DealActivity.class);
             startActivity(intent);
-
             return true;
+            case R.id.logout_menu: //https://firebase.google.com/docs/auth/android/firebaseui : SignOut
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Log.d("Logout", "User logged out");
+                                FirebaseUtil.attachListener();
+                            }
+                        });
+                FirebaseUtil.detachListener();
         }
         return super.onOptionsItemSelected(item);
     }
